@@ -1,0 +1,38 @@
+service: publisher
+
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  stage: dev
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Resource: "*"
+          Action:
+            - "sns:*"
+
+functions:
+  msg:
+    handler: publish.publish
+    events:
+      - http:
+          path: message
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    Topic01:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: Mentorship
+    
+    MySubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: filipkenkov@gmail.com
+        Protocol: email
+        TopicArn: !Ref 'Topic01'
